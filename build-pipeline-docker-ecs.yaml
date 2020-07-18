@@ -40,7 +40,7 @@ Resources:
                 Owner: !Ref RepositoryOwner
                 Repo: !Ref RepositoryName
                 Branch: !Ref RepositoryBranch
-                OAuthToken: "32be253a5cc8dd61c61f6ad9d6d6bd49d2640ed1" # Should be changed
+                OAuthToken: "14b06acf7086da3a380eb756cb2725b55f77232e" # Should be changed
               OutputArtifacts:
               - Name: SourceOutput
         - Name: Build
