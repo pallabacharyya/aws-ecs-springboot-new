@@ -1,0 +1,6 @@
+{
+  "Parameters": {
+    "DockerImageRepository": "ecs-fargate-demo-image",
+    "ImageTag": "latest"
+  }
+}
