@@ -72,12 +72,12 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: 'DemoApi'
+      ClusterName: 'EmployeeApi'
 
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: ecs-services-load-balacer
+      Name: ecs-services
       Subnets:
         - !Ref 'Subnet1'
         - !Ref 'Subnet2'
@@ -106,7 +106,7 @@ Resources:
   DefaultTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: defaultTargetDemo
+      Name: default
       VpcId: !Ref 'VPC'
       Protocol: 'HTTP'
       Port: '80'
@@ -114,7 +114,7 @@ Resources:
   CloudWatchLogsGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: 'Demo-Log-api'
+      LogGroupName: 'employee-api'
       RetentionInDays: 1
 
   ContainerSecurityGroup:
@@ -137,7 +137,7 @@ Resources:
         - FARGATE
       ExecutionRoleArn: !Ref ECSTaskExecutionRole
       ContainerDefinitions:
-        - Name: demo-api
+        - Name: employee-api
           Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${DockerImageRepository}:${ImageTag}
           Cpu: 1024
           Memory: 2048
@@ -147,15 +147,15 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: 'demo-api'
+              awslogs-group: 'employee-api'
               awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: 'demo-api'
+              awslogs-stream-prefix: 'employee-api'
 
   Service:
     Type: AWS::ECS::Service
     DependsOn: ListenerRule
     Properties:
-      ServiceName: demo-service
+      ServiceName: employee-service
       TaskDefinition: !Ref Task
       Cluster: !Ref ECSCluster
       LaunchType: FARGATE
@@ -172,14 +172,14 @@ Resources:
           SecurityGroups:
             - !Ref ContainerSecurityGroup
       LoadBalancers:
-        - ContainerName: demo-api
+        - ContainerName: employee-api
           ContainerPort: 8080
           TargetGroupArn: !Ref TargetGroup
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: fargetdemo-tg
+      Name: employee-tg
       VpcId: !Ref VPC
       Port: 80
       Protocol: HTTP
@@ -229,7 +229,7 @@ Resources:
 Outputs:
 
   ApiEndpoint:
-    Description: ECS Farget Demo Api Endpoint
-    Value: !Join ['', ['http://', !GetAtt LoadBalancer.DNSName, '/demo']]
+    Description: Employee API Endpoint
+    Value: !Join ['', ['http://', !GetAtt LoadBalancer.DNSName, '/employees']]
     Export:
-      Name: 'EcsFargateDemoApi'
+      Name: 'Employee1ApiEndpoint'
