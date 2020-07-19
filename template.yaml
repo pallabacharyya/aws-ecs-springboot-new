@@ -72,7 +72,7 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: 'EmployeeApi'
+      ClusterName: 'FargateDemoApi'
 
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -114,7 +114,7 @@ Resources:
   CloudWatchLogsGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: 'employee-api'
+      LogGroupName: 'fargatedemo-api'
       RetentionInDays: 1
 
   ContainerSecurityGroup:
@@ -137,7 +137,7 @@ Resources:
         - FARGATE
       ExecutionRoleArn: !Ref ECSTaskExecutionRole
       ContainerDefinitions:
-        - Name: employee-api
+        - Name: fargatedemo-api
           Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${DockerImageRepository}:${ImageTag}
           Cpu: 1024
           Memory: 2048
@@ -147,15 +147,15 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: 'employee-api'
+              awslogs-group: 'fargatedemo-api'
               awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: 'employee-api'
+              awslogs-stream-prefix: 'fargatedemo-api'
 
   Service:
     Type: AWS::ECS::Service
     DependsOn: ListenerRule
     Properties:
-      ServiceName: employee-service
+      ServiceName: fargatedemo-service
       TaskDefinition: !Ref Task
       Cluster: !Ref ECSCluster
       LaunchType: FARGATE
@@ -172,14 +172,14 @@ Resources:
           SecurityGroups:
             - !Ref ContainerSecurityGroup
       LoadBalancers:
-        - ContainerName: employee-api
+        - ContainerName: fargatedemo-api
           ContainerPort: 8080
           TargetGroupArn: !Ref TargetGroup
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: employee-tg
+      Name: fargatedemo-tg
       VpcId: !Ref VPC
       Port: 80
       Protocol: HTTP
@@ -229,7 +229,7 @@ Resources:
 Outputs:
 
   ApiEndpoint:
-    Description: Employee API Endpoint
-    Value: !Join ['', ['http://', !GetAtt LoadBalancer.DNSName, '/employees']]
+    Description: FargateDemo API Endpoint
+    Value: !Join ['', ['http://', !GetAtt LoadBalancer.DNSName, '/fargatedemos']]
     Export:
-      Name: 'Employee1ApiEndpoint'
+      Name: 'FargateDemoApiEndpoint'
