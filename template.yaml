@@ -106,7 +106,7 @@ Resources:
   DefaultTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: defaultdemo
+      Name: defaultTargetDemo
       VpcId: !Ref 'VPC'
       Protocol: 'HTTP'
       Port: '80'
@@ -137,7 +137,7 @@ Resources:
         - FARGATE
       ExecutionRoleArn: !Ref ECSTaskExecutionRole
       ContainerDefinitions:
-        - Name: employee-api
+        - Name: demo-api
           Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${DockerImageRepository}:${ImageTag}
           Cpu: 1024
           Memory: 2048
@@ -147,9 +147,9 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: 'employee-api'
+              awslogs-group: 'demo-api'
               awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: 'employee-api'
+              awslogs-stream-prefix: 'demo-api'
 
   Service:
     Type: AWS::ECS::Service
@@ -172,7 +172,7 @@ Resources:
           SecurityGroups:
             - !Ref ContainerSecurityGroup
       LoadBalancers:
-        - ContainerName: employee-api
+        - ContainerName: demo-api
           ContainerPort: 8080
           TargetGroupArn: !Ref TargetGroup
 
@@ -230,6 +230,6 @@ Outputs:
 
   ApiEndpoint:
     Description: ECS Farget Demo Api Endpoint
-    Value: !Join ['', ['http://', !GetAtt LoadBalancer.DNSName, '/demos']]
+    Value: !Join ['', ['http://', !GetAtt LoadBalancer.DNSName, '/demo']]
     Export:
       Name: 'EcsFargateDemoApi'
