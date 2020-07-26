@@ -71,13 +71,11 @@ Resources:
 
   ECSCluster:
     Type: AWS::ECS::Cluster
-    Properties:
-      ClusterName: 'FargateDemoApi'
+    
 
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: ecs-services
       Subnets:
         - !Ref 'Subnet1'
         - !Ref 'Subnet2'
@@ -106,7 +104,6 @@ Resources:
   DefaultTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: default
       VpcId: !Ref 'VPC'
       Protocol: 'HTTP'
       Port: '80'
@@ -114,8 +111,8 @@ Resources:
   CloudWatchLogsGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: 'fargatedemo-api'
-      RetentionInDays: 1
+     LogGroupName: !Sub ${DockerImageRepository}-${ImageTag}-awslogs-group
+     RetentionInDays: 1
 
   ContainerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -137,7 +134,7 @@ Resources:
         - FARGATE
       ExecutionRoleArn: !Ref ECSTaskExecutionRole
       ContainerDefinitions:
-        - Name: fargatedemo-api
+        - Name: !Sub ${DockerImageRepository}-${ImageTag}
           Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${DockerImageRepository}:${ImageTag}
           Cpu: 1024
           Memory: 2048
@@ -147,15 +144,14 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: 'fargatedemo-api'
+              awslogs-group: !Sub ${DockerImageRepository}-${ImageTag}-awslogs-group
               awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: 'fargatedemo-api'
+              awslogs-stream-prefix: !Sub ${DockerImageRepository}-${ImageTag}-awslogs-group
 
   Service:
     Type: AWS::ECS::Service
     DependsOn: ListenerRule
     Properties:
-      ServiceName: fargatedemo-service
       TaskDefinition: !Ref Task
       Cluster: !Ref ECSCluster
       LaunchType: FARGATE
@@ -172,14 +168,13 @@ Resources:
           SecurityGroups:
             - !Ref ContainerSecurityGroup
       LoadBalancers:
-        - ContainerName: fargatedemo-api
+        - ContainerName: !Sub ${DockerImageRepository}-${ImageTag}
           ContainerPort: 8080
           TargetGroupArn: !Ref TargetGroup
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: fargatedemo-tg
       VpcId: !Ref VPC
       Port: 80
       Protocol: HTTP
@@ -229,7 +224,7 @@ Resources:
 Outputs:
 
   ApiEndpoint:
-    Description: FargateDemo API Endpoint
-    Value: !Join ['', ['http://', !GetAtt LoadBalancer.DNSName, '/home']]
+    Description: Employee API Endpoint
+    Value: !Join ['', ['http://', !GetAtt LoadBalancer.DNSName, '/employee']]
     Export:
-      Name: 'FargateDemoApiEndpoint'
+      Name: 'EcsFargateDemoApiEndpoint'
