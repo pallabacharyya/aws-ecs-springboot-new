@@ -318,5 +318,4 @@ Resources:
                   - iam:DetachRolePolicy
                   - iam:PassRole
                 Resource:
-                  - !Sub arn:aws:iam::${AWS::AccountId}:role/* 
-             
+                  - !Sub arn:aws:iam::${AWS::AccountId}:role/*            
