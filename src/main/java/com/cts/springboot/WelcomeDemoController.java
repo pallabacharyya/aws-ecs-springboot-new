@@ -10,7 +10,7 @@ public class WelcomeDemoController {
 	public String homeApi() {
 		
 		System.out.println("Inside home API");
-		String fargateStr= "!!!  Hi All, Welcome to AWS ECS Fargate Demo  !!!";
+		String fargateStr= "!!!  Hi All : Welcome to AWS ECS Fargate Demo  !!!";
 			
 		return fargateStr;
 	}
